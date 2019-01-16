@@ -1,0 +1,11 @@
+[package]
+name = "sc2ai-rs"
+version = "0.1.0"
+authors = ["Davis Wahl <daviswahl@gmail.com>"]
+build = "build.rs"
+
+[dependencies]
+protobuf = "~2.0"
+
+[build-dependencies]
+protoc-rust = "~2.0"
