@@ -6,6 +6,11 @@ build = "build.rs"
 
 [dependencies]
 protobuf = "~2.0"
+websocket = "0.22.2"
+futures = "0.1"
+tokio = "0.1"
 
 [build-dependencies]
 protoc-rust = "~2.0"
+
+
