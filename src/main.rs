@@ -1,3 +1,7 @@
+#![feature(fn_traits)]
+#![feature(unboxed_closures)]
+
+#[macro_use]
 extern crate futures;
 extern crate websocket;
 extern crate tokio;
@@ -5,6 +9,9 @@ extern crate protobuf;
 
 mod engine;
 mod connection;
+mod unit;
+
+use unit::{UnitFutureExt,UnitStreamExt};
 use protobuf::Message;
 
 
@@ -16,16 +23,19 @@ use futures::IntoFuture;
 mod protos;
 
 use protos::sc2api;
+use std::sync::Arc;
+use std::sync::Mutex;
+use unit::unit;
+use std::thread::JoinHandle;
 
 
 fn main() {
-    let mut runtime = tokio::runtime::current_thread::Builder::new()
-        .build()
-        .unwrap();
 
     let conn = connection::connect();
-    match runtime.block_on(conn) {
-        Ok(c) => println!("got a connection"),
-        Err(e) => println!("{:?}", e),
-    }
+    let engine = conn.map_err(unit).and_then(move |c| {
+        let mut e = engine::new(c);
+        e.run().map_err(unit)
+    });
+
+    tokio::run(engine.unit_err("engine run"));
 }
